@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HCP Gross Profit Calculator</title>
+    <style>
+        /*
+         * Simple, modern styling for the HCP calculator.
+         * The design is intentionally clean to appeal to busy healthcare providers.
+         */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 25px 30px;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 1.5rem;
+            text-align: center;
+            color: #333333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444444;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .results {
+            margin-top: 25px;
+            background: #f9f9f9;
+            border: 1px solid #eeeeee;
+            border-radius: 8px;
+            padding: 15px 20px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-row span {
+            color: #555555;
+        }
+
+        .result-row strong {
+            color: #333333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #121212;
+            }
+            .calculator {
+                background: #1e1e1e;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            h1 {
+                color: #e0e0e0;
+            }
+            label {
+                color: #cccccc;
+            }
+            select,
+            input[type="number"] {
+                background: #2a2a2a;
+                border: 1px solid #444444;
+                color: #f0f0f0;
+            }
+            .results {
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+            }
+            .result-row span {
+                color: #bbbbbb;
+            }
+            .result-row strong {
+                color: #f0f0f0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <h1>HCP Gross Profit Calculator</h1>
+    <label for="product">Select Product</label>
+    <select id="product">
+        <option value="TruHealth">TruHealth</option>
+        <option value="TruAge">TruAge</option>
+        <option value="Combo">TruHealth + TruAge Combo</option>
+    </select>
+
+    <label for="quantity">Patients Tested (Number of Kits)</label>
+    <input type="number" id="quantity" min="1" value="1" step="1">
+
+    <div class="results" id="results">
+        <!-- Results will be inserted here -->
+    </div>
+</div>
+
+<script>
+    /*
+     * Data structure representing pricing and tiers for each product.
+     * Each tier includes a minimum quantity (min), a name, the purchase price (what the HCP pays)
+     * and the suggested MSRP (what the HCP charges patients).  The tiers are ordered from highest
+     * to lowest minimum quantity so that we can find the first tier matching the user's input.
+     */
+    const pricingData = {
+        TruHealth: {
+            tiers: [
+                { name: 'Platinum (150+)', min: 150, purchase: 250, msrp: 399 },
+                { name: 'Gold (50-149)', min: 50, purchase: 300, msrp: 399 },
+                { name: 'Silver (10-49)', min: 10, purchase: 350, msrp: 399 },
+                { name: 'Standard (1-9)', min: 1, purchase: 375, msrp: 399 }
+            ]
+        },
+        TruAge: {
+            tiers: [
+                { name: 'Platinum (150+)', min: 150, purchase: 250, msrp: 399 },
+                { name: 'Gold (50-149)', min: 50, purchase: 300, msrp: 399 },
+                { name: 'Silver (10-49)', min: 10, purchase: 350, msrp: 399 },
+                { name: 'Standard (1-9)', min: 1, purchase: 375, msrp: 399 }
+            ]
+        },
+        Combo: {
+            tiers: [
+                { name: 'Platinum (150+)', min: 150, purchase: 400, msrp: 679 },
+                { name: 'Gold (50-149)', min: 50, purchase: 450, msrp: 679 },
+                { name: 'Silver (10-49)', min: 10, purchase: 500, msrp: 679 },
+                { name: 'Standard (1-9)', min: 1, purchase: 550, msrp: 679 }
+            ]
+        }
+    };
+
+    /**
+     * Determine the pricing tier for a given product and quantity.
+     * Tiers are evaluated in descending order of minimum quantity so the first tier with
+     * qty >= min is selected.  If none match (should not happen with min=1), the last tier is returned.
+     * @param {Object} productData The product's pricing tiers.
+     * @param {number} qty The user specified quantity (number of patients/kits).
+     * @returns {Object} The selected tier data.
+     */
+    function getTier(productData, qty) {
+        for (const tier of productData.tiers) {
+            if (qty >= tier.min) {
+                return tier;
+            }
+        }
+        // Fallback to last tier if nothing matches
+        return productData.tiers[productData.tiers.length - 1];
+    }
+
+    /**
+     * Update the display of results based on current form inputs.  Reads the selected
+     * product and quantity, finds the appropriate tier, computes profit and revenue,
+     * and populates the results container in the DOM.
+     */
+    function updateResults() {
+        const productSelect = document.getElementById('product');
+        const qtyInput = document.getElementById('quantity');
+        const resultsContainer = document.getElementById('results');
+
+        const productKey = productSelect.value;
+        let qty = parseInt(qtyInput.value, 10);
+        // Guard against non-numeric or empty input
+        if (isNaN(qty) || qty < 1) {
+            qty = 1;
+            qtyInput.value = qty;
+        }
+
+        const productData = pricingData[productKey];
+        const tier = getTier(productData, qty);
+        const profitPerTest = tier.msrp - tier.purchase;
+        const marginPercent = (profitPerTest / tier.msrp) * 100;
+        const totalProfit = profitPerTest * qty;
+        const totalRevenue = tier.msrp * qty;
+
+        // Format numbers with two decimals and thousands separators
+        function formatCurrency(num) {
+            return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function formatNumber(num) {
+            return num.toFixed(1) + '%';
+        }
+
+        resultsContainer.innerHTML = `
+            <div class="result-row"><span>Tier</span><strong>${tier.name}</strong></div>
+            <div class="result-row"><span>Purchase Price per Test</span><strong>${formatCurrency(tier.purchase)}</strong></div>
+            <div class="result-row"><span>Suggested MSRP per Test</span><strong>${formatCurrency(tier.msrp)}</strong></div>
+            <div class="result-row"><span>Gross Profit per Test</span><strong>${formatCurrency(profitPerTest)}</strong></div>
+            <div class="result-row"><span>Gross Margin (%)</span><strong>${formatNumber(marginPercent)}</strong></div>
+            <div class="result-row"><span>Total Gross Profit</span><strong>${formatCurrency(totalProfit)}</strong></div>
+            <div class="result-row"><span>Total Revenue</span><strong>${formatCurrency(totalRevenue)}</strong></div>
+        `;
+    }
+
+    // Attach event listeners to inputs so results update live
+    document.getElementById('product').addEventListener('change', updateResults);
+    document.getElementById('quantity').addEventListener('input', updateResults);
+
+    // Initial calculation on page load
+    updateResults();
+</script>
+
+</body>
+</html>
