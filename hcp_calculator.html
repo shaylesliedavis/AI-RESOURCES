@@ -10,10 +10,12 @@
          */
         body {
             font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            /* Light neutral background inspired by TruDiagnostic's clean aesthetic */
+            background: #F9FAFB;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -21,36 +23,48 @@
 
         .calculator {
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            /* Softer shadow for a floating card effect */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 600px;
-            padding: 25px 30px;
+            max-width: 680px;
+            padding: 30px 35px;
+            margin-bottom: 40px;
         }
 
         h1 {
-            margin: 0 0 20px 0;
-            font-size: 1.5rem;
+            margin: 0 0 24px 0;
+            font-size: 1.6rem;
             text-align: center;
-            color: #333333;
+            /* Brand colour for headings */
+            color: #5C3EDF;
         }
 
         label {
             display: block;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #444444;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #374151;
         }
 
         select,
         input[type="number"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #cccccc;
-            border-radius: 5px;
+            padding: 10px 12px;
+            border: 1px solid #CBD5E0;
+            border-radius: 6px;
             font-size: 1rem;
             box-sizing: border-box;
+            background: #FFFFFF;
+            color: #374151;
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #7C3AED; /* purple accent on focus */
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
         }
 
         input[type="number"]::-webkit-inner-spin-button,
@@ -61,17 +75,17 @@
 
         .results {
             margin-top: 25px;
-            background: #f9f9f9;
-            border: 1px solid #eeeeee;
+            background: #F8FAFC;
+            border: 1px solid #E5E7EB;
             border-radius: 8px;
-            padding: 15px 20px;
+            padding: 18px 22px;
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #E5E7EB;
         }
 
         .result-row:last-child {
@@ -79,11 +93,11 @@
         }
 
         .result-row span {
-            color: #555555;
+            color: #6B7280;
         }
 
         .result-row strong {
-            color: #333333;
+            color: #111827;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -117,9 +131,67 @@
                 color: #f0f0f0;
             }
         }
+
+        /* Pricing table styles */
+        #pricing-detail {
+            margin-top: 40px;
+        }
+        #pricing-detail table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        #pricing-detail h2 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: #1F2937;
+            font-weight: 600;
+        }
+
+        /* TruDiagnostic brand styles */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5C3EDF; /* purple hue inspired by TruDiagnostic branding */
+        }
+        .brand-tagline {
+            display: block;
+            font-size: 0.8rem;
+            color: #64748B; /* muted grey for tagline */
+            margin-top: 4px;
+        }
+        #pricing-detail th,
+        #pricing-detail td {
+            padding: 8px 10px;
+            border: 1px solid #dddddd;
+            text-align: left;
+        }
+        #pricing-detail th {
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+        @media (prefers-color-scheme: dark) {
+            #pricing-detail th {
+                background: #2a2a2a;
+                color: #f0f0f0;
+            }
+            #pricing-detail td {
+                color: #f0f0f0;
+            }
+        }
     </style>
 </head>
 <body>
+
+<!-- TruDiagnostic branding header -->
+<div class="brand-header">
+    <span class="brand-name">TruDiagnostic™</span>
+    <span class="brand-tagline">The Epigenetic Company</span>
+</div>
 
 <div class="calculator">
     <h1>HCP Gross Profit Calculator</h1>
@@ -130,6 +202,16 @@
         <option value="Combo">TruHealth + TruAge Combo</option>
     </select>
 
+    <!-- Optional tier selector. Users can pick a specific tier to see pricing for that tier rather than automatically determining it by quantity. -->
+    <label for="tier">Select Tier (optional)</label>
+    <select id="tier">
+        <option value="">Auto (based on kits)</option>
+        <option value="Standard">Standard (1-9)</option>
+        <option value="Silver">Silver (10-49)</option>
+        <option value="Gold">Gold (50-149)</option>
+        <option value="Platinum">Platinum (150+)</option>
+    </select>
+
     <label for="quantity">Patients Tested (Number of Kits)</label>
     <input type="number" id="quantity" min="1" value="1" step="1">
 
@@ -138,6 +220,10 @@
     </div>
 </div>
 
+<!-- Standalone HCP pricing reference table -->
+<div id="pricing-detail">
+    <!-- Pricing details will be populated by the script -->
+</div>
 <script>
     /*
      * Data structure representing pricing and tiers for each product.
@@ -198,6 +284,7 @@
     function updateResults() {
         const productSelect = document.getElementById('product');
         const qtyInput = document.getElementById('quantity');
+        const tierSelect = document.getElementById('tier');
         const resultsContainer = document.getElementById('results');
 
         const productKey = productSelect.value;
@@ -209,7 +296,18 @@
         }
 
         const productData = pricingData[productKey];
-        const tier = getTier(productData, qty);
+        const selectedTierName = tierSelect.value;
+        let tier;
+        if (!selectedTierName) {
+            // auto-detect based on quantity
+            tier = getTier(productData, qty);
+        } else {
+            // find tier by prefix match (case-insensitive)
+            tier = productData.tiers.find(t => t.name.toLowerCase().startsWith(selectedTierName.toLowerCase()));
+            if (!tier) {
+                tier = getTier(productData, qty);
+            }
+        }
         const profitPerTest = tier.msrp - tier.purchase;
         const marginPercent = (profitPerTest / tier.msrp) * 100;
         const totalProfit = profitPerTest * qty;
@@ -235,11 +333,49 @@
         `;
     }
 
+    /**
+     * Generate the HCP pricing detail table.  Iterates over all products and tiers
+     * defined in pricingData, computes gross margin percentage and profit per test,
+     * and inserts a table into the pricing-detail container.
+     */
+    function generatePricingTable() {
+        const container = document.getElementById('pricing-detail');
+        // helper to format currency consistent with updateResults
+        function formatCurrency(num) {
+            return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        let html = '<h2>HCP Pricing Detail</h2>';
+        html += '<table><thead><tr>' +
+                 '<th>Product</th><th>Tier</th><th>Purchase Price</th><th>Suggested MSRP</th>' +
+                 '<th>Gross Margin (%)</th><th>Gross Profit ($)</th>' +
+                 '</tr></thead><tbody>';
+        for (const [productKey, productData] of Object.entries(pricingData)) {
+            // Human-friendly product name
+            const productName = productKey === 'Combo' ? 'TruHealth + TruAge Combo' : productKey;
+            productData.tiers.forEach(t => {
+                const profit = t.msrp - t.purchase;
+                const margin = (profit / t.msrp) * 100;
+                html += '<tr>' +
+                        '<td>' + productName + '</td>' +
+                        '<td>' + t.name + '</td>' +
+                        '<td>' + formatCurrency(t.purchase) + '</td>' +
+                        '<td>' + formatCurrency(t.msrp) + '</td>' +
+                        '<td>' + margin.toFixed(3) + '%</td>' +
+                        '<td>' + formatCurrency(profit) + '</td>' +
+                        '</tr>';
+            });
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
     // Attach event listeners to inputs so results update live
     document.getElementById('product').addEventListener('change', updateResults);
     document.getElementById('quantity').addEventListener('input', updateResults);
+    document.getElementById('tier').addEventListener('change', updateResults);
 
-    // Initial calculation on page load
+    // Generate pricing detail table and perform initial calculation on page load
+    generatePricingTable();
     updateResults();
 </script>
 
