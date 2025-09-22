@@ -182,7 +182,51 @@
             #pricing-detail td {
                 color: #f0f0f0;
             }
+     
+    /* Info tables container for pricing detail and time breakdown */
+    #info-tables {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 40px;
+    }
+    #info-tables > div {
+        flex: 1;
+        min-width: 300px;
+    }
+    /* Breakdown by time interval table styles */
+    #time-breakdown h2 {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+        color: #1F2937;
+        font-weight: 600;
+    }
+    #time-breakdown table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    #time-breakdown th,
+    #time-breakdown td {
+        padding: 8px 10px;
+        border: 1px solid #dddddd;
+        text-align: left;
+    }
+    #time-breakdown th {
+        background: #F3F4F6;
+        color: #1F2937;
+    }
+    @media (prefers-color-scheme: dark) {
+        #time-breakdown th {
+            background: #2a2a2a;
+            color: #f0f0f0;
         }
+        #time-breakdown td {
+            color: #f0f0f0;
+        }
+    }
+   }
     </style>
 </head>
 <body>
@@ -224,10 +268,57 @@
 <div id="pricing-detail">
     <!-- Pricing details will be populated by the script -->
 </div>
-<script>
-    /*
-     * Data structure representing pricing and tiers for each product.
-     * Each tier includes a minimum quantity (min), a name, the purchase price (what the HCP pays)
+<sc<!-- Info tables container for pricing detail and breakdown -->
+<div id="info-tables">
+<!-- Info tables container for pricing detail and breakdown -->
+                                                                     <div id="info-tables">">
+   <!-- Standalone HCP pricing reference table -->
+    <div id="pricing-detail">
+        <!-- Pricing details will be populated by the script -->
+    </div>
+    <!-- Breakdown by Time Interval -->
+    <div id="time-breakdown">
+        <h2>Breakdown by Time Interval</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tier</th>
+                    <th>Per Day</th>
+                    <th>Per Week</th>
+                    <th>Per Month</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Platinum (150+)</td>
+                    <td>1.67+ kits</td>
+                    <td>11.5+ kits</td>
+                    <td>49.7+ kits</td>
+                </tr>
+                <tr>
+                    <td>Gold (50–149)</td>
+                    <td>0.55–1.66 kits</td>
+                    <td>~3.9–11.4 kits</td>
+                    <td>16.4–49.6 kits</td>
+                </tr>
+                <tr>
+                    <td>Silver (10–49)</td>
+                    <td>0.11–0.54 kits</td>
+                    <td>~0.8–3.8 kits</td>
+                    <td>3.3–16.3 kits</td>
+                </tr>
+                <tr>
+                    <td>Standard (1–9)</td>
+                    <td>0.01–0.10 kits</td>
+                    <td>~0–0.7 kits</td>
+                    <td>0.3–3 kits</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+  *</div>
+ Each tier includes a minimum quantity (min), a name, the purchase price (what the HCP pays)
      * and the suggested MSRP (what the HCP charges patients).  The tiers are ordered from highest
      * to lowest minimum quantity so that we can find the first tier matching the user's input.
      */
