@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HCP Gross Profit Calculator</title>
+    <title>Provider Revenue Calculator</title>
     <style>
         /*
-         * Simple, modern styling for the HCP calculator.
+         * Simple, modern styling for the calculator.
          * The design is intentionally clean to appeal to busy healthcare providers.
          */
         body {
@@ -132,6 +132,16 @@
             }
         }
 
+        /* TruDiagnostic brand styles */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .brand-header img {
+            max-width: 250px;
+            height: auto;
+        }
+
         /* Pricing table styles */
         #pricing-detail {
             margin-top: 40px;
@@ -147,23 +157,6 @@
             color: #1F2937;
             font-weight: 600;
         }
-
-        /* TruDiagnostic brand styles */
-        .brand-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .brand-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #5C3EDF; /* purple hue inspired by TruDiagnostic branding */
-        }
-        .brand-tagline {
-            display: block;
-            font-size: 0.8rem;
-            color: #64748B; /* muted grey for tagline */
-            margin-top: 4px;
-        }
         #pricing-detail th,
         #pricing-detail td {
             padding: 8px 10px;
@@ -172,80 +165,68 @@
         }
         #pricing-detail th {
             background: #F3F4F6;
-                color: #1F2937;
-@media (prefers-color-scheme: dark) {
-    
-    #pricing-detail th {
-        background: #2a2a2a;
-        color: #f0f0f0;
-    }
-    #pricing-detail td {
-        color: #f0f0f0;
-    }
-}
-        
-
-    /* Info tables container for pricing detail and time breakdown */
-    #info-tables {
-        display: none;
-        
-        gap: 40px;
-        flex-wrap: wrap;
-        width: 100%;
-        margin-top: 40px;
-    }
-    #info-tables > div {
-        flex: 1;
-        min-width: 300px;
-    }
-       margin-top: 40px;
-            
-}
-
-    /* Breakdown by time interval table styles */
-
-        font-size: 1.25rem;
-        margin-bottom: 12px;
-        color: #1F2937;
-        font-weight: 600;
-    }
-    #time-breakdown table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-    #time-breakdown th,
-    #time-breakdown td {
-        padding: 8px 10px;
-        border: 1px solid #dddddd;
-        text-align: left;
-    }
-    #time-breakdown th {
-        background: #F3F4F6;
-        color: #1F2937;
-    }
-    @media (prefers-color-scheme: dark) {
-        #time-breakdown th {
-            background: #2a2a2a;
-            color: #f0f0f0;
+            color: #1F2937;
         }
+        @media (prefers-color-scheme: dark) {
+            #pricing-detail th {
+                background: #2a2a2a;
+                color: #f0f0f0;
+            }
+            #pricing-detail td {
+                color: #f0f0f0;
+            }
+        }
+
+        /* Info tables container for pricing detail and time breakdown */
+        #info-tables {
+            display: none; /* hide the pricing and breakdown tables */
+            gap: 40px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-top: 40px;
+        }
+        #info-tables > div {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Breakdown by time interval table styles */
+        #time-breakdown table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        #time-breakdown th,
         #time-breakdown td {
-            color: #f0f0f0;
+            padding: 8px 10px;
+            border: 1px solid #dddddd;
+            text-align: left;
         }
-}
-
+        #time-breakdown th {
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+        @media (prefers-color-scheme: dark) {
+            #time-breakdown th {
+                background: #2a2a2a;
+                color: #f0f0f0;
+            }
+            #time-breakdown td {
+                color: #f0f0f0;
+            }
+        }
     </style>
-</head
+</head>
 <body>
 
 <!-- TruDiagnostic branding header -->
 <div class="brand-header">
-    <span class="brand-name">TruDiagnostic™</span>
-    <span class="brand-tagline">The Epigenetic Company</span>
+    <!-- Use the uploaded logo file -->
+    <img src="tru_logo_small.png" alt="TruDiagnostic logo">
 </div>
 
 <div class="calculator">
-    <h1>HCP Gross Profit Calculator</h1>
+    <h1>Provider Revenue Calculator</h1>
     <label for="product">Select Product</label>
     <select id="product">
         <option value="TruHealth">TruHealth</option>
@@ -271,11 +252,9 @@
     </div>
 </div>
 
-<!-- Standalone HCP pricing reference table -->
-<!-- Info tables container for pricing detail and breakdown -->
-                                                                    
-       <div id="info-tables" style="display:none;">
-        <!-- Standalone HCP pricing reference table -->
+<!-- Info tables container for pricing detail and breakdown (hidden) -->
+<div id="info-tables" style="display:none;">
+    <!-- Standalone HCP pricing reference table -->
     <div id="pricing-detail">
         <!-- Pricing details will be populated by the script -->
     </div>
@@ -319,13 +298,13 @@
             </tbody>
         </table>
     </div>
-          
 </div>
-    <script>
-/*  Each tier includes a minimum quantity (min), a name, the purchase price (what the HCP pays)
-     * and the suggested MSRP (what the HCP charges patients).  The tiers are ordered from highest
-     * to lowest minimum quantity so that we can find the first tier matching the user's input.
-     */
+
+<script>
+    /*  Each tier includes a minimum quantity (min), a name, the purchase price (what the HCP pays)
+         * and the suggested MSRP (what the HCP charges patients).  The tiers are ordered from highest
+         * to lowest minimum quantity so that we can find the first tier matching the user's input.
+         */
     const pricingData = {
         TruHealth: {
             tiers: [
