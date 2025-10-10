@@ -234,15 +234,9 @@
         <option value="Combo">TruHealth + TruAge Combo</option>
     </select>
 
-    <!-- Optional tier selector. Users can pick a specific tier to see pricing for that tier rather than automatically determining it by quantity. -->
-    <label for="tier">Select Tier (optional)</label>
-    <select id="tier">
-        <option value="">Auto (based on kits)</option>
-        <option value="Standard">Standard (1-9)</option>
-        <option value="Silver">Silver (10-49)</option>
-        <option value="Gold">Gold (50-149)</option>
-        <option value="Platinum">Platinum (150+)</option>
-    </select>
+    <!-- Price input instead of tier selector. Healthcare providers can enter the price they wish to charge patients. -->
+    <label for="msrp">Your Price per Test</label>
+    <input type="number" id="msrp" min="0" step="0.01" placeholder="Enter price">
 
     <label for="quantity">Patients Tested (Number of Kits)</label>
     <input type="number" id="quantity" min="1" value="1" step="1">
@@ -358,7 +352,7 @@
     function updateResults() {
         const productSelect = document.getElementById('product');
         const qtyInput = document.getElementById('quantity');
-        const tierSelect = document.getElementById('tier');
+        const msrpInput = document.getElementById('msrp');
         const resultsContainer = document.getElementById('results');
 
         const productKey = productSelect.value;
@@ -370,22 +364,18 @@
         }
 
         const productData = pricingData[productKey];
-        const selectedTierName = tierSelect.value;
-        let tier;
-        if (!selectedTierName) {
-            // auto-detect based on quantity
-            tier = getTier(productData, qty);
-        } else {
-            // find tier by prefix match (case-insensitive)
-            tier = productData.tiers.find(t => t.name.toLowerCase().startsWith(selectedTierName.toLowerCase()));
-            if (!tier) {
-                tier = getTier(productData, qty);
-            }
+        // Always auto-detect tier based on quantity
+        const tier = getTier(productData, qty);
+        // Determine the price the provider wants to charge. If invalid or zero, default to the tier's suggested MSRP
+        let enteredPrice = parseFloat(msrpInput.value);
+        if (isNaN(enteredPrice) || enteredPrice <= 0) {
+            enteredPrice = tier.msrp;
         }
-        const profitPerTest = tier.msrp - tier.purchase;
-        const marginPercent = (profitPerTest / tier.msrp) * 100;
+        const profitPerTest = enteredPrice - tier.purchase;
+        // Guard against divide-by-zero; if enteredPrice is zero, margin is 0
+        const marginPercent = enteredPrice > 0 ? (profitPerTest / enteredPrice) * 100 : 0;
         const totalProfit = profitPerTest * qty;
-        const totalRevenue = tier.msrp * qty;
+        const totalRevenue = enteredPrice * qty;
 
         // Format numbers with two decimals and thousands separators
         function formatCurrency(num) {
@@ -399,7 +389,7 @@
         resultsContainer.innerHTML = `
             <div class="result-row"><span>Tier</span><strong>${tier.name}</strong></div>
             <div class="result-row"><span>Purchase Price per Test</span><strong>${formatCurrency(tier.purchase)}</strong></div>
-            <div class="result-row"><span>Suggested MSRP per Test</span><strong>${formatCurrency(tier.msrp)}</strong></div>
+            <div class="result-row"><span>Your Price per Test</span><strong>${formatCurrency(enteredPrice)}</strong></div>
             <div class="result-row"><span>Gross Profit per Test</span><strong>${formatCurrency(profitPerTest)}</strong></div>
             <div class="result-row"><span>Gross Margin (%)</span><strong>${formatNumber(marginPercent)}</strong></div>
             <div class="result-row"><span>Total Gross Profit</span><strong>${formatCurrency(totalProfit)}</strong></div>
@@ -446,7 +436,7 @@
     // Attach event listeners to inputs so results update live
     document.getElementById('product').addEventListener('change', updateResults);
     document.getElementById('quantity').addEventListener('input', updateResults);
-    document.getElementById('tier').addEventListener('change', updateResults);
+    document.getElementById('msrp').addEventListener('input', updateResults);
 
     // Generate pricing detail table and perform initial calculation on page load
     generatePricingTable();
