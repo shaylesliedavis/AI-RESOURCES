@@ -100,6 +100,22 @@
             color: #111827;
         }
 
+        /* Highlight the total gross profit and total revenue rows by centering and enlarging text */
+        .result-row.total-profit,
+        .result-row.total-revenue {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        .result-row.total-profit strong,
+        .result-row.total-revenue strong {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
         @media (prefers-color-scheme: dark) {
             body {
                 background: #121212;
@@ -235,11 +251,12 @@
     </select>
 
     <!-- Price input instead of tier selector. Healthcare providers can enter the price they wish to charge patients. -->
-    <label for="msrp">Your Price per Test</label>
+    <label for="msrp">Patient Price</label>
     <input type="number" id="msrp" min="0" step="0.01" placeholder="Enter price">
 
     <label for="quantity">Patients Tested (Number of Kits)</label>
-    <input type="number" id="quantity" min="1" value="1" step="1">
+    <!-- Leave blank by default; users can still input the number of kits sold -->
+    <input type="number" id="quantity" min="1" step="1" placeholder="Enter number of kits">
 
     <div class="results" id="results">
         <!-- Results will be inserted here -->
@@ -359,8 +376,8 @@
         let qty = parseInt(qtyInput.value, 10);
         // Guard against non-numeric or empty input
         if (isNaN(qty) || qty < 1) {
+            // Default quantity to 1 for calculation if none entered.  Do not overwrite the input value so the field remains blank.
             qty = 1;
-            qtyInput.value = qty;
         }
 
         const productData = pricingData[productKey];
@@ -389,11 +406,11 @@
         resultsContainer.innerHTML = `
             <div class="result-row"><span>Tier</span><strong>${tier.name}</strong></div>
             <div class="result-row"><span>Purchase Price per Test</span><strong>${formatCurrency(tier.purchase)}</strong></div>
-            <div class="result-row"><span>Your Price per Test</span><strong>${formatCurrency(enteredPrice)}</strong></div>
+            <div class="result-row"><span>Patient Price</span><strong>${formatCurrency(enteredPrice)}</strong></div>
             <div class="result-row"><span>Gross Profit per Test</span><strong>${formatCurrency(profitPerTest)}</strong></div>
             <div class="result-row"><span>Gross Margin (%)</span><strong>${formatNumber(marginPercent)}</strong></div>
-            <div class="result-row"><span>Total Gross Profit</span><strong>${formatCurrency(totalProfit)}</strong></div>
-            <div class="result-row"><span>Total Revenue</span><strong>${formatCurrency(totalRevenue)}</strong></div>
+            <div class="result-row total-profit"><span>Total Gross Profit</span><strong>${formatCurrency(totalProfit)}</strong></div>
+            <div class="result-row total-revenue"><span>Total Revenue</span><strong>${formatCurrency(totalRevenue)}</strong></div>
         `;
     }
 
